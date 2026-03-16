@@ -2,12 +2,12 @@
 
 MVP for the first database in the 4-database respiratory atlas plan.
 
-## Scope (Week 1)
+## Scope (current MVP)
 - Search: gene / cell type / tissue
 - Filter: species / stage / platform
-- Visualization: UMAP (metadata coloring default)
+- Visualization: metadata-based summary placeholder for UMAP page
 - Detail pages: evidence + source + version
-- Download/API: minimal endpoints
+- Download/API: minimal working endpoints
 
 ## Repository Structure
 - `template/freeze.md`: frozen master-template contract
@@ -15,8 +15,24 @@ MVP for the first database in the 4-database respiratory atlas plan.
 - `configs/development_atlas.yaml`: DB1 config
 - `rev/checklist.md`: review gates
 - `data/sample/development_records.json`: sample data for local validation
+- `frontend/`: static frontend for six-page atlas shell
+- `server.mjs`: minimal local server + API routes
 
-## Next Steps
-1. Implement API handlers against `schema_v1`.
-2. Bind frontend to unified endpoints (`/search`, `/browse`, `/detail`, `/download`).
-3. Run Rev checklist before demo.
+## Run locally
+```bash
+cd /Users/macmini/coding/4database/lungdev
+npm start
+```
+
+Open: `http://localhost:3000`
+
+## Working API
+- `GET /api/search?q=&species=&stage=&platform=`
+- `GET /api/browse?q=&species=&stage=&platform=`
+- `GET /api/detail/:record_id`
+- `GET /api/download`
+
+## Current limitations
+- UMAP page is a placeholder summary, not a true embedding renderer yet.
+- Data source is sample JSON, not production dataset integration yet.
+- No test harness yet; this is a demoable MVP shell.
