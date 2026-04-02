@@ -1,3 +1,0 @@
-taskId=SLK-49702859
-owner=research_engineer
-workdir=/Users/macmini/coding/web_template

@@ -16,4 +16,12 @@ try {
   // optional folder
 }
 
+const singleCellViewerSrc = path.join(root, 'singlecell-viewer', 'dist');
+const singleCellViewerDist = path.join(dist, 'singlecell-viewer');
+try {
+  await cp(singleCellViewerSrc, singleCellViewerDist, { recursive: true });
+} catch {
+  // optional folder
+}
+
 console.log('Build complete: dist/');

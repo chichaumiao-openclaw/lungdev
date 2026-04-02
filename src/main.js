@@ -1,175 +1,176 @@
 import { cssVarsFor } from './theme.js';
-import { renderGlobalSearch } from './modules.js';
-import { siteConfig } from './site-content.js';
+import {
+  renderAboutPage,
+  renderAtlasPage,
+  renderDatasetsPage,
+  renderHomePage,
+  renderLineagesPage,
+  renderMarkersPage,
+  initMarkerSearch
+} from './modules.js';
+import { developmentStageFilters, navigationItems, siteMeta } from './data.js';
 import { normalizeRoute, routeFromHash } from './router.js';
 
 let route = routeFromHash(window.location.hash);
 let mode = 'light';
+let atlasStage = developmentStageFilters[0].id;
 
-function setTheme() {
+const institutionalLinks = [
+  {
+    label: 'Home',
+    href: 'http://www.gznl.org/',
+    icon: './src/assets/header/home.svg'
+  },
+  {
+    label: 'Database',
+    href: 'https://www.gznl.org/database/',
+    icon: './src/assets/header/database.svg'
+  },
+  {
+    label: 'Research',
+    href: 'https://www.gznl.org/research/',
+    icon: './src/assets/header/research.svg'
+  },
+  {
+    label: 'About us',
+    href: 'https://www.gznl.org/aboutus/',
+    icon: './src/assets/header/aboutus.svg'
+  },
+  {
+    label: 'GZNL-RDC',
+    href: 'https://gzlab.ac.cn/',
+    icon: './src/assets/header/gznl2.svg'
+  }
+];
+
+function setTheme(modeKey) {
   const styleTag = document.getElementById('theme-vars') ?? document.createElement('style');
   styleTag.id = 'theme-vars';
-  styleTag.textContent = `:root { ${cssVarsFor(siteConfig.themeKey, mode)} }`;
+  styleTag.textContent = `:root { ${cssVarsFor(siteMeta.defaultTheme, modeKey)} }`;
   document.head.appendChild(styleTag);
-  document.body.setAttribute('data-mode', mode);
+  document.body.setAttribute('data-mode', modeKey);
 }
 
-function parseMetricValue(raw) {
-  const numeric = Number(String(raw).replace(/[^\d.]/g, ''));
-  return Number.isFinite(numeric) ? numeric : 0;
+function currentRouteLabel() {
+  return navigationItems.find((item) => item.id === route)?.label ?? 'Home';
 }
 
-function nav() {
-  return `<header>
-    <div class="black-nav" aria-label="Global navigation">
-      <a href="#home">${siteConfig.siteName}</a>
-      <span>${siteConfig.tagline}</span>
+function renderHeader() {
+  return `<header class="app-header">
+    <div class="institutional-nav">
+      ${institutionalLinks
+        .map(
+          (item) => `<a class="institutional-link" href="${item.href}" target="_blank" rel="noopener noreferrer">
+            <img src="${item.icon}" alt="" />
+            <span>${item.label}</span>
+          </a>`
+        )
+        .join('')}
     </div>
     <div class="top-nav">
-      <strong>${siteConfig.siteName}</strong>
-      <nav>
-        ${siteConfig.routes
-          .map(
-            (key) => `<button class="nav-btn ${route === key ? 'active' : ''}" data-route="${key}">${siteConfig.navLabels[key] ?? key}</button>`
-          )
-          .join('')}
-      </nav>
-      <div class="theme-controls">
-        <label>Mode
-          <select id="mode-switcher">
-            <option value="light" ${mode === 'light' ? 'selected' : ''}>Light</option>
-            <option value="dark" ${mode === 'dark' ? 'selected' : ''}>Dark</option>
-          </select>
-        </label>
+      <div class="brand-block">
+        <div class="brand-mark">LD</div>
+        <div>
+          <p class="eyebrow">Development axis</p>
+          <div class="brand-title">${siteMeta.label}</div>
+          <p class="brand-copy">${siteMeta.strapline}</p>
+        </div>
+      </div>
+      <div class="nav-cluster">
+        <button type="button" class="ghost mode-toggle" id="mode-switcher">
+          ${mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+        </button>
+        <nav class="nav-list" aria-label="lungdev navigation">
+          ${navigationItems
+            .map(
+              (item) => `<button
+                type="button"
+                class="nav-btn ${item.id === route ? 'active' : ''}"
+                data-route="${item.id}"
+                title="${item.kicker}"
+                aria-current="${item.id === route ? 'page' : 'false'}"
+              >
+                <span class="nav-label">${item.label}</span>
+                <span class="nav-tooltip" role="tooltip">${item.kicker}</span>
+              </button>`
+            )
+            .join('')}
+        </nav>
       </div>
     </div>
   </header>`;
 }
 
-function heroMetrics() {
-  return siteConfig.metrics
-    .map(
-      (item) => `<div><strong data-animate-number="true" data-target="${parseMetricValue(item.value)}">${item.value}</strong><span>${item.label}</span></div>`
-    )
-    .join('');
+function renderFooter() {
+  return `<footer class="black-footer">
+    <div class="black-footer-inner">
+      <span>© Guangzhou National Laboratory</span>
+      <span class="sep">|</span>
+      ${institutionalLinks
+        .map(
+          (item) => `<a href="${item.href}" target="_blank" rel="noopener noreferrer">${item.label}</a>`
+        )
+        .join('')}
+    </div>
+  </footer>`;
 }
 
-function homePage() {
-  return `<main class="page-home">
-    <section class="hero card">
-      <div>
-        <span class="eyebrow">${siteConfig.hero.eyebrow}</span>
-        <h1>${siteConfig.hero.title}</h1>
-        <p>${siteConfig.hero.description}</p>
-        <div class="actions">
-          <button data-route="atlas">Open atlas</button>
-          <button class="ghost" data-route="lineages">Explore lineages</button>
-        </div>
-      </div>
-      <div class="hero-metrics">${heroMetrics()}</div>
-    </section>
-
-    <section class="card">
-      <h2>Stage overview</h2>
-      <div class="stats-grid compact">
-        ${siteConfig.stageCards.map((item) => `<article class="mini-card"><strong>${item.name}</strong><span>${item.count}</span></article>`).join('')}
-      </div>
-    </section>
-
-    <section class="stats-grid">
-      ${siteConfig.lineageCards.map((item) => `<article class="card"><h3>${item.title}</h3><p>${item.text}</p></article>`).join('')}
-    </section>
-
-    <section class="card">
-      <h2>Prototype modules</h2>
-      <ul>
-        <li>Development atlas entrypoint with stage-aware exploration</li>
-        <li>Lineage transition stories for epithelial, mesenchymal, and immune compartments</li>
-        <li>Marker gene spotlight for branching, maturation, and commitment programs</li>
-        <li>Dataset releases and references prepared for download integration</li>
-      </ul>
-    </section>
-
-    ${renderGlobalSearch()}
-  </main>`;
+function pageFor(name) {
+  const safeRoute = normalizeRoute(name);
+  if (safeRoute === 'atlas') return renderAtlasPage(atlasStage, mode);
+  if (safeRoute === 'lineages') return renderLineagesPage();
+  if (safeRoute === 'markers') return renderMarkersPage();
+  if (safeRoute === 'datasets') return renderDatasetsPage();
+  if (safeRoute === 'about') return renderAboutPage();
+  return renderHomePage();
 }
 
-function atlasPage() {
-  return `<main class="page-browse">
-    <section class="card">
-      <h1>Development Atlas</h1>
-      <p>Navigate developmental stages from embryonic to adult reference with reusable atlas cards and future dimensionality-reduction views.</p>
-      <div class="stats-grid compact">
-        ${siteConfig.stageCards.map((item) => `<article class="mini-card"><strong>${item.name}</strong><span>${item.count}</span></article>`).join('')}
-      </div>
-    </section>
-    ${renderGlobalSearch()}
-  </main>`;
-}
-
-function lineagesPage() {
-  return `<main class="page-browse">
-    <section class="card"><h1>Lineage Programs</h1><p>Track cell-state transitions and developmental branching logic across major lung compartments.</p></section>
-    <section class="stats-grid">
-      ${siteConfig.lineageCards.map((item) => `<article class="card"><h3>${item.title}</h3><p>${item.text}</p></article>`).join('')}
-    </section>
-  </main>`;
-}
-
-function markersPage() {
-  return `<main class="page-browse">
-    <section class="card"><h1>Marker Programs</h1><p>Curated stage-specific markers and lineage commitment signatures.</p></section>
-    <section class="stats-grid">
-      ${siteConfig.markerSections.map((item) => `<article class="card"><h3>${item.title}</h3><p>${item.text}</p></article>`).join('')}
-    </section>
-  </main>`;
-}
-
-function datasetsPage() {
-  return `<main class="page-browse">
-    <section class="card"><h1>Datasets</h1><p>Shared download and release area for harmonized developmental datasets.</p></section>
-    <section class="card"><ul>${siteConfig.datasets.map((item) => `<li>${item}</li>`).join('')}</ul></section>
-  </main>`;
-}
-
-function aboutPage() {
-  return `<main class="page-browse">
-    <section class="card"><h1>About ${siteConfig.siteName}</h1><p>${siteConfig.about}</p></section>
-  </main>`;
-}
-
-function renderPage() {
-  switch (route) {
-    case 'atlas':
-      return atlasPage();
-    case 'lineages':
-      return lineagesPage();
-    case 'markers':
-      return markersPage();
-    case 'datasets':
-      return datasetsPage();
-    case 'about':
-      return aboutPage();
-    default:
-      return homePage();
-  }
-}
-
-function render() {
-  setTheme();
-  document.body.innerHTML = `${nav()}${renderPage()}`;
-
-  document.querySelectorAll('[data-route]').forEach((node) => {
-    node.addEventListener('click', () => {
-      const next = normalizeRoute(node.getAttribute('data-route'));
-      window.location.hash = next;
+function bindNavigation() {
+  document.querySelectorAll('[data-route]').forEach((element) => {
+    element.addEventListener('click', () => {
+      route = normalizeRoute(element.getAttribute('data-route'));
+      window.location.hash = route;
     });
   });
+}
 
-  document.getElementById('mode-switcher')?.addEventListener('change', (event) => {
-    mode = event.target.value;
-    render();
+function bindViewerMessages() {
+  if (window.__lungdevViewerListenerBound) return;
+
+  window.addEventListener('message', (event) => {
+    const payload = event.data;
+    if (!payload || payload.type !== 'lungdev-stage-change') return;
+    if (!developmentStageFilters.some((stage) => stage.id === payload.stage)) return;
+    atlasStage = payload.stage;
   });
+
+  window.__lungdevViewerListenerBound = true;
+}
+
+function bindModeToggle() {
+  document.getElementById('mode-switcher')?.addEventListener('click', () => {
+    mode = mode === 'light' ? 'dark' : 'light';
+    render({ preserveScroll: true });
+  });
+}
+
+function render(options = {}) {
+  const { preserveScroll = false } = options;
+  const previousScrollX = window.scrollX;
+  const previousScrollY = window.scrollY;
+
+  setTheme(mode);
+  document.title = `${siteMeta.label} | ${currentRouteLabel()}`;
+  document.getElementById('app').innerHTML = `${renderHeader()}${pageFor(route)}${renderFooter()}`;
+
+  bindNavigation();
+  bindViewerMessages();
+  bindModeToggle();
+  initMarkerSearch();
+
+  if (preserveScroll) {
+    requestAnimationFrame(() => window.scrollTo(previousScrollX, previousScrollY));
+  }
 }
 
 window.addEventListener('hashchange', () => {
