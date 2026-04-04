@@ -5,6 +5,8 @@ export const siteMeta = {
   siteId: 'lungdev',
   label: 'lungdev',
   title: 'Lung Development Atlas',
+  githubPagesUrl: 'https://chichaumiao-openclaw.github.io/lungdev/',
+  customDomain: 'lungdev.gznl.org',
   strapline: 'A single-cell database of lung development from early fetal stages to mature adulthood.',
   heroIntro:
     'Map how epithelial, stromal, vascular, and immune compartments emerge, diverge, and mature across the human lung developmental axis.',
@@ -21,28 +23,36 @@ export const databasePortfolio = [
     id: 'lungdev',
     label: 'lungdev',
     axis: 'Development',
-    status: 'Active prototype',
+    status: 'Integrated MVP',
+    url: 'https://chichaumiao-openclaw.github.io/lungdev/',
+    customDomain: 'lungdev.gznl.org',
     summary: 'Stage-resolved developmental atlas from early fetal lung to mature adulthood.'
   },
   {
     id: 'lunginf',
-    label: 'lungInf',
+    label: 'lunginf',
     axis: 'Infection / inflammation',
-    status: 'Architecture scoped',
+    status: 'Integrated MVP',
+    url: 'https://chichaumiao-openclaw.github.io/lunginf/',
+    customDomain: 'lunginf.gznl.org',
     summary: 'Host response, pathogen-specific remodeling, and injury-repair programs.'
   },
   {
     id: 'lungcancer',
     label: 'lungcancer',
     axis: 'Cancer',
-    status: 'Architecture scoped',
+    status: 'Integrated MVP',
+    url: 'https://chichaumiao-openclaw.github.io/lungcancer/',
+    customDomain: 'lungcancer.gznl.org',
     summary: 'Malignant ecosystems, microenvironment remodeling, and clinical heterogeneity.'
   },
   {
     id: 'lungevo',
     label: 'lungevo',
     axis: 'Evolution',
-    status: 'Architecture scoped',
+    status: 'Integrated MVP',
+    url: 'https://chichaumiao-openclaw.github.io/lungevo/',
+    customDomain: 'lungevo.gznl.org',
     summary: 'Cross-species respiratory programs, homology, and lineage innovation.'
   }
 ];
@@ -419,10 +429,110 @@ export const routeCopy = {
   }
 };
 
+export const bundleCrossLinks = {
+  home: [
+    {
+      siteId: 'lunginf',
+      route: 'conditions',
+      title: 'Compare development with infection-driven remodeling',
+      summary: 'Use condition anchors to ask which injury and repair states echo or diverge from developmental lung programs.'
+    },
+    {
+      siteId: 'lungevo',
+      route: 'species',
+      title: 'Set human development inside vertebrate respiratory evolution',
+      summary: 'Move from stage progression into fish-to-human species anchors to distinguish conserved from lineage-specific structure.'
+    },
+    {
+      siteId: 'lungcancer',
+      route: 'subtypes',
+      title: 'Track adult-lineage programs resurfacing in tumor ecosystems',
+      summary: 'Compare developmental cell-state logic with malignant subtype programs and therapy-linked plasticity.'
+    }
+  ],
+  atlas: [
+    {
+      siteId: 'lungevo',
+      route: 'species',
+      title: 'Add comparative species context to developmental UMAP views',
+      summary: 'Use the species backbone to ask which respiratory cell programs predate mature human lung states.'
+    },
+    {
+      siteId: 'lunginf',
+      route: 'conditions',
+      title: 'Contrast developmental baselines with infected lung states',
+      summary: 'Jump from normal stage-resolved tissue structure into healthy-versus-infected condition comparison.'
+    }
+  ],
+  lineages: [
+    {
+      siteId: 'lungevo',
+      route: 'programs',
+      title: 'Compare lineage emergence with conserved and divergent programs',
+      summary: 'Use evolutionary program calls to test which developmental transitions look deeply conserved versus later-specialized.'
+    },
+    {
+      siteId: 'lungcancer',
+      route: 'biomarkers',
+      title: 'Check lineage-associated markers in tumor ecosystems',
+      summary: 'Connect developmental lineage anchors to malignant and microenvironment biomarker interpretation.'
+    }
+  ],
+  markers: [
+    {
+      siteId: 'lungcancer',
+      route: 'biomarkers',
+      title: 'Follow developmental markers into lung cancer biomarker space',
+      summary: 'Compare developmental genes against subtype- and treatment-linked malignant marker programs.'
+    },
+    {
+      siteId: 'lungevo',
+      route: 'orthologs',
+      title: 'Compare marker genes against ortholog and homology mappings',
+      summary: 'Use the ortholog workspace to see which developmental markers stay interpretable across species.'
+    }
+  ],
+  datasets: [
+    {
+      siteId: 'lunginf',
+      route: 'datasets',
+      title: 'Inspect the infection release table',
+      summary: 'Compare developmental datasets with healthy-versus-infected release logic and immune-response framing.'
+    },
+    {
+      siteId: 'lungevo',
+      route: 'datasets',
+      title: 'Review the comparative evolution release table',
+      summary: 'Use comparative dataset provenance to align developmental interpretation with species and homology assumptions.'
+    }
+  ],
+  about: [
+    {
+      siteId: 'lunginf',
+      route: 'home',
+      title: 'See how the infection portal stays distinct from development',
+      summary: 'The infection axis centers host response, pathogen class, and tissue injury rather than developmental time.'
+    },
+    {
+      siteId: 'lungcancer',
+      route: 'home',
+      title: 'See how the cancer portal reuses the shell without reusing the biology',
+      summary: 'The cancer axis organizes the same platform around malignant ecosystems, subtype logic, and clinical heterogeneity.'
+    },
+    {
+      siteId: 'lungevo',
+      route: 'home',
+      title: 'See how the evolution portal reframes lung questions comparatively',
+      summary: 'The evolution axis centers homolog mapping, species anchors, and conserved versus divergent respiratory programs.'
+    }
+  ]
+};
+
 export const launchChecklist = [
   'Route-complete MVP across home, atlas, lineages, markers, datasets, and about',
   'Development-specific homepage narrative and stage timeline',
   'Marker spotlight and searchable gene catalog entry point',
   'Dataset cards with provenance and prototype status',
+  'Cross-linked bundle metadata, mobile nav shell, and custom-domain deployment wiring',
   'Build and regression checks updated for lungdev'
 ];

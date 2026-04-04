@@ -8,12 +8,13 @@ import {
   renderMarkersPage,
   initMarkerSearch
 } from './modules.js';
-import { developmentStageFilters, navigationItems, siteMeta } from './data.js';
+import { databasePortfolio, developmentStageFilters, navigationItems, siteMeta } from './data.js';
 import { normalizeRoute, routeFromHash } from './router.js';
 
 let route = routeFromHash(window.location.hash);
 let mode = 'light';
 let atlasStage = developmentStageFilters[0].id;
+let mobileNavOpen = false;
 
 const institutionalLinks = [
   {
@@ -55,6 +56,33 @@ function currentRouteLabel() {
   return navigationItems.find((item) => item.id === route)?.label ?? 'Home';
 }
 
+function bundleHomeHref(site) {
+  return `${site.url}#home`;
+}
+
+function renderBundleSwitcher() {
+  return `<div class="bundle-switcher">
+    <div class="bundle-switcher-head">
+      <span class="bundle-switcher-title">Lung Database Bundle</span>
+      <span class="bundle-domain">${siteMeta.customDomain}</span>
+    </div>
+    <div class="bundle-links" aria-label="Four lung database bundle switcher">
+      ${databasePortfolio
+        .map(
+          (site) => `<a
+            class="bundle-pill ${site.id === siteMeta.siteId ? 'active' : ''}"
+            href="${bundleHomeHref(site)}"
+            ${site.id === siteMeta.siteId ? 'aria-current="page"' : ''}
+          >
+            <span class="bundle-pill-label">${site.label}</span>
+            <small>${site.axis}</small>
+          </a>`
+        )
+        .join('')}
+    </div>
+  </div>`;
+}
+
 function renderHeader() {
   return `<header class="app-header">
     <div class="institutional-nav">
@@ -77,10 +105,24 @@ function renderHeader() {
         </div>
       </div>
       <div class="nav-cluster">
-        <button type="button" class="ghost mode-toggle" id="mode-switcher">
-          ${mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-        </button>
-        <nav class="nav-list" aria-label="lungdev navigation">
+        <div class="nav-utility-row">
+          ${renderBundleSwitcher()}
+          <div class="nav-actions">
+            <button type="button" class="ghost mode-toggle" id="mode-switcher">
+              ${mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            </button>
+            <button
+              type="button"
+              class="ghost nav-toggle"
+              id="nav-menu-toggle"
+              aria-expanded="${mobileNavOpen ? 'true' : 'false'}"
+              aria-controls="site-navigation"
+            >
+              ${mobileNavOpen ? 'Close menu' : 'Open menu'}
+            </button>
+          </div>
+        </div>
+        <nav class="nav-list ${mobileNavOpen ? 'open' : ''}" id="site-navigation" aria-label="lungdev navigation">
           ${navigationItems
             .map(
               (item) => `<button
@@ -104,13 +146,32 @@ function renderHeader() {
 function renderFooter() {
   return `<footer class="black-footer">
     <div class="black-footer-inner">
-      <span>© Guangzhou National Laboratory</span>
-      <span class="sep">|</span>
-      ${institutionalLinks
-        .map(
-          (item) => `<a href="${item.href}" target="_blank" rel="noopener noreferrer">${item.label}</a>`
-        )
-        .join('')}
+      <div class="footer-stack">
+        <div class="footer-row">
+          <span>© Guangzhou National Laboratory</span>
+          <span class="sep">|</span>
+          ${institutionalLinks
+            .map(
+              (item) => `<a href="${item.href}" target="_blank" rel="noopener noreferrer">${item.label}</a>`
+            )
+            .join('')}
+        </div>
+        <div class="footer-row footer-bundle">
+          <span class="footer-heading">Bundle</span>
+          ${databasePortfolio
+            .map(
+              (site) => `<a href="${bundleHomeHref(site)}" ${site.id === siteMeta.siteId ? 'aria-current="page"' : ''}>${site.label}</a>`
+            )
+            .join('')}
+        </div>
+        <div class="footer-row footer-domain">
+          <span class="footer-heading">GitHub Pages</span>
+          <a href="${siteMeta.githubPagesUrl}" target="_blank" rel="noopener noreferrer">${siteMeta.githubPagesUrl}</a>
+          <span class="sep">|</span>
+          <span class="footer-heading">Custom domain</span>
+          <strong>${siteMeta.customDomain}</strong>
+        </div>
+      </div>
     </div>
   </footer>`;
 }
@@ -128,7 +189,15 @@ function pageFor(name) {
 function bindNavigation() {
   document.querySelectorAll('[data-route]').forEach((element) => {
     element.addEventListener('click', () => {
-      route = normalizeRoute(element.getAttribute('data-route'));
+      const nextRoute = normalizeRoute(element.getAttribute('data-route'));
+      mobileNavOpen = false;
+
+      if (route === nextRoute && window.location.hash === `#${nextRoute}`) {
+        render({ preserveScroll: true });
+        return;
+      }
+
+      route = nextRoute;
       window.location.hash = route;
     });
   });
@@ -154,6 +223,13 @@ function bindModeToggle() {
   });
 }
 
+function bindMenuToggle() {
+  document.getElementById('nav-menu-toggle')?.addEventListener('click', () => {
+    mobileNavOpen = !mobileNavOpen;
+    render({ preserveScroll: true });
+  });
+}
+
 function render(options = {}) {
   const { preserveScroll = false } = options;
   const previousScrollX = window.scrollX;
@@ -166,6 +242,7 @@ function render(options = {}) {
   bindNavigation();
   bindViewerMessages();
   bindModeToggle();
+  bindMenuToggle();
   initMarkerSearch();
 
   if (preserveScroll) {
@@ -175,6 +252,7 @@ function render(options = {}) {
 
 window.addEventListener('hashchange', () => {
   route = routeFromHash(window.location.hash);
+  mobileNavOpen = false;
   render();
 });
 

@@ -1,5 +1,6 @@
 import {
   atlasViews,
+  bundleCrossLinks,
   coreQuestions,
   databasePortfolio,
   datasetReleases,
@@ -29,6 +30,16 @@ function renderSectionHead(kicker, title, description) {
     <h2>${title}</h2>
     <p>${description}</p>
   </div>`;
+}
+
+function bundleSiteById(siteId) {
+  return databasePortfolio.find((site) => site.id === siteId);
+}
+
+function bundleHref(siteId, route = 'home') {
+  const site = bundleSiteById(siteId);
+  if (!site) return '#';
+  return route ? `${site.url}#${route}` : site.url;
 }
 
 function getSingleCellViewerUrl() {
@@ -77,7 +88,7 @@ function renderMarkerResults(items, options = {}) {
 export function renderHeroSection() {
   return `<section class="hero-shell card" id="LD-HERO-001">
     <div class="hero-copy">
-      <p class="eyebrow">Four Lung Databases Prototype</p>
+      <p class="eyebrow">Four Lung Database Bundle</p>
       <h1>${siteMeta.title}</h1>
       <p class="hero-strap">${siteMeta.strapline}</p>
       <p>${siteMeta.heroIntro}</p>
@@ -363,13 +374,42 @@ export function renderPortfolioSection() {
     <div class="portfolio-grid">
       ${relatedSites
         .map(
-          (site) => `<article class="portfolio-card card">
+          (site) => `<a class="portfolio-card card" href="${bundleHref(site.id)}">
             <span>${site.axis}</span>
             <h3>${site.label}</h3>
             <p>${site.summary}</p>
             <strong>${site.status}</strong>
-          </article>`
+            <small>${site.customDomain}</small>
+          </a>`
         )
+        .join('')}
+    </div>
+  </section>`;
+}
+
+export function renderBundleBridgeSection(routeId, moduleId = 'LD-BRIDGE-001') {
+  const links = bundleCrossLinks[routeId] ?? [];
+
+  if (!links.length) return '';
+
+  return `<section class="section-block" id="${moduleId}">
+    ${renderSectionHead(
+      'Bundle links',
+      'Follow complementary routes across the four lung databases',
+      'This page is cross-linked to the other portals so developmental questions can stay connected to infection, cancer, and evolution views.'
+    )}
+    <div class="bundle-bridge-grid">
+      ${links
+        .map((link) => {
+          const site = bundleSiteById(link.siteId);
+          if (!site) return '';
+          return `<a class="bundle-bridge-card card" href="${bundleHref(link.siteId, link.route)}">
+            <span>${site.axis} · ${site.label}</span>
+            <h3>${link.title}</h3>
+            <p>${link.summary}</p>
+            <strong>${site.customDomain}</strong>
+          </a>`;
+        })
         .join('')}
     </div>
   </section>`;
@@ -393,6 +433,7 @@ export function renderHomePage() {
     ${renderLineageSection({ compact: true })}
     ${renderMarkerSection({ compact: true })}
     ${renderDatasetSection({ compact: true })}
+    ${renderBundleBridgeSection('home')}
     ${renderPortfolioSection()}
   </main>`;
 }
@@ -403,6 +444,7 @@ export function renderAtlasPage(selectedStage = 'embryonic', mode = 'light') {
     ${renderAtlasViewerSection(selectedStage, mode)}
     ${renderAtlasOverviewSection()}
     ${renderStageOverviewSection()}
+    ${renderBundleBridgeSection('atlas')}
     ${renderEvidenceSection()}
   </main>`;
 }
@@ -421,6 +463,7 @@ export function renderLineagesPage() {
         ${coreQuestions.map((question) => `<li>${question}</li>`).join('')}
       </ul>
     </section>
+    ${renderBundleBridgeSection('lineages')}
   </main>`;
 }
 
@@ -436,6 +479,7 @@ export function renderMarkersPage() {
       )}
       ${renderChipList(metadataPriorities)}
     </section>
+    ${renderBundleBridgeSection('markers')}
   </main>`;
 }
 
@@ -444,6 +488,7 @@ export function renderDatasetsPage() {
     ${renderPageBanner('datasets')}
     ${renderDatasetSection()}
     ${renderEvidenceSection()}
+    ${renderBundleBridgeSection('datasets')}
   </main>`;
 }
 
@@ -475,6 +520,7 @@ export function renderAboutPage() {
         </ul>
       </article>
     </section>
+    ${renderBundleBridgeSection('about')}
     ${renderPortfolioSection()}
   </main>`;
 }

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   DATA_VERSION,
   DETERMINISTIC_SEED,
+  bundleCrossLinks,
   databasePortfolio,
   datasetReleases,
   markerCatalog,
@@ -17,6 +18,11 @@ test('portfolio exposes the four orthogonal lung database axes', () => {
   assert.deepEqual(
     databasePortfolio.map((site) => site.id),
     ['lungdev', 'lunginf', 'lungcancer', 'lungevo']
+  );
+  assert.ok(
+    databasePortfolio.every(
+      (site) => /^https:\/\/chichaumiao-openclaw\.github\.io\/lung/.test(site.url) && /\.gznl\.org$/.test(site.customDomain)
+    )
   );
 });
 
@@ -50,6 +56,14 @@ test('dataset releases describe scope, assay, and scale', () => {
 test('site metadata identifies the lungdev workspace', () => {
   assert.equal(siteMeta.siteId, 'lungdev');
   assert.equal(siteMeta.defaultTheme, 'lungdev');
+  assert.equal(siteMeta.githubPagesUrl, 'https://chichaumiao-openclaw.github.io/lungdev/');
+  assert.equal(siteMeta.customDomain, 'lungdev.gznl.org');
+});
+
+test('bundle cross-links cover the route-level development entry points', () => {
+  assert.deepEqual(Object.keys(bundleCrossLinks), ['home', 'atlas', 'lineages', 'markers', 'datasets', 'about']);
+  assert.ok(bundleCrossLinks.atlas.some((link) => link.siteId === 'lungevo' && link.route === 'species'));
+  assert.ok(bundleCrossLinks.markers.some((link) => link.siteId === 'lungcancer' && link.route === 'biomarkers'));
 });
 
 test('provenance history is chronological', () => {

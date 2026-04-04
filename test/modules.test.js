@@ -11,6 +11,7 @@ test('home page includes the core lungdev MVP modules', () => {
     'LD-LINEAGE-001',
     'LD-MARKER-001',
     'LD-DATASET-001',
+    'LD-BRIDGE-001',
     'LD-PORTFOLIO-001'
   ];
 
@@ -20,7 +21,9 @@ test('home page includes the core lungdev MVP modules', () => {
 
   assert.match(html, /Lung Development Atlas/);
   assert.match(html, /early fetal stages to mature adulthood/i);
+  assert.match(html, /Four Lung Database Bundle/);
   assert.match(html, /Browse the atlas/);
+  assert.match(html, /https:\/\/chichaumiao-openclaw\.github\.io\/lunginf\/#conditions/);
 });
 
 test('markers page exposes searchable gene spotlight UI', () => {
@@ -36,6 +39,7 @@ test('datasets page includes evidence and provenance rails', () => {
   const html = renderDatasetsPage();
 
   assert.match(html, /LD-EVIDENCE-001/);
+  assert.match(html, /LD-BRIDGE-001/);
   assert.match(html, /Dataset release table/);
   assert.match(html, /Human fetal-to-adult reference integration/);
   assert.match(html, /<table class="data-table">/);
@@ -51,4 +55,5 @@ test('atlas page centers on the embedded single-cell viewer', () => {
   assert.match(html, /iframe/);
   assert.match(html, /stage=canalicular/);
   assert.match(html, /mode=dark/);
+  assert.match(html, /Follow complementary routes across the four lung databases/);
 });
