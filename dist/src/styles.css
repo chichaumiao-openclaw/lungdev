@@ -227,9 +227,14 @@ input {
 }
 
 main.page-shell {
-  width: min(1180px, calc(100% - 32px));
+  width: min(1600px, calc(100% - 32px));
   margin: 0 auto;
   padding: 28px 0 48px;
+}
+
+/* Dataset detail page - wider container for tables */
+.page-shell.dataset-detail-shell {
+  width: min(1600px, calc(100% - 32px));
 }
 
 .card {
@@ -377,7 +382,100 @@ main.page-shell {
 .lineage-card,
 .portfolio-card {
   padding: 18px;
+  position: relative;
 }
+
+/* Card border — crisp edges */
+.card,
+.stage-card.structured {
+  border: 1px solid #e0e0e0;
+  border-radius: var(--radius, 6px);
+}
+
+/* ── Card-inner: flex column ───────────────────────────────
+   Stage-header: fixed 80px height → border-bottom is the
+   ONLY horizontal line, always perfectly straight.
+   Three section blocks share remaining space equally.
+   ─────────────────────────────────────────────────────── */
+.stage-card.structured .card-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Stage header — fixed height pins the bottom border line ── */
+.stage-card.structured .stage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  height: 80px;
+  padding-bottom: 0;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.stage-card.structured .stage-label {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--textPrimary);
+  line-height: 1.3;
+}
+
+.stage-card.structured .stage-window {
+  font-size: 0.78rem;
+  color: var(--textSecondary);
+  text-align: left;
+  padding-left: 0;
+  margin-left: -0.5em;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+/* ── Section blocks — equal flex share, spacing via padding-top ── */
+.section-block {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  /* No border-top — spacing via padding only */
+}
+
+/* Biological Emphasis */
+.section-emphasis {
+  padding-top: 14px;
+}
+
+/* Dominant Compartments */
+.section-compartments {
+  padding-top: 14px;
+}
+
+/* Developmental Question */
+.section-question {
+  padding-top: 14px;
+}
+
+/* ── Section header: bold, uniform color ── */
+.stage-section-header {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  margin: 0 0 6px 0;
+}
+
+/* ── Section body — min-height equalises header positions ── */
+.section-body {
+  flex: 1;
+  min-height: 0;
+  overflow: visible;
+}
+
+.section-emphasis .section-body  { min-height: 70px; }
+.section-compartments .section-body { min-height: 90px; }
+.section-question .section-body  { min-height: 60px; }
 
 .stage-meta {
   display: flex;
@@ -405,6 +503,20 @@ main.page-shell {
 .lineage-label {
   color: var(--accentStrong);
   font-weight: 700;
+}
+
+.lineage-tag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(120, 120, 120, 0.12);
+  color: var(--textSecondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .stage-question,
@@ -482,10 +594,260 @@ main.page-shell {
   color: var(--primary);
 }
 
+/* ===== Stage Card Redesign (Structured Layout) ===== */
+.stage-card.structured {
+  padding: 0;
+  overflow: hidden;
+}
+
+.stage-card.structured .card-inner {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.stage-card.structured .stage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.stage-card.structured .stage-label {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--textPrimary);
+}
+
+.stage-card.structured .stage-window {
+  font-size: 0.78rem;
+  color: var(--textSecondary);
+  text-align: left;
+  padding-left: 0;
+  margin-left: -0.5em;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+.stage-section {
+  margin-bottom: 18px;
+}
+
+.stage-section:last-child {
+  margin-bottom: 0;
+}
+
+.stage-section-header {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  margin: 0 0 6px 0;
+}
+
+.stage-bio-headline {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--accentStrong);
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+}
+
+.stage-bio-summary {
+  font-size: 0.85rem;
+  color: var(--textSecondary);
+  margin: 0 0 10px 0;
+  line-height: 1.5;
+}
+
+.stage-inline-expand {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: none;
+  border: none;
+  padding: 4px 0;
+  cursor: pointer;
+  transition: color 0.15s ease;
+  text-decoration: none;
+}
+
+.stage-inline-expand:hover {
+  color: var(--primaryHover);
+  text-decoration: underline;
+}
+
+.stage-inline-expand.active {
+  color: var(--primaryHover);
+}
+
+.stage-inline-expand .expand-arrow {
+  transition: transform 0.2s ease;
+  font-size: 0.7rem;
+}
+
+.stage-inline-expand.active .expand-arrow {
+  transform: rotate(90deg);
+}
+
+.stage-expand-content {
+  display: none;
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--surfaceAlt);
+  border-radius: 8px;
+  border-left: 2px solid var(--primary);
+}
+
+.stage-expand-content ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.stage-expand-content li {
+  margin-bottom: 8px;
+  font-size: 0.82rem;
+  color: var(--textSecondary);
+  line-height: 1.5;
+}
+
+.stage-expand-content li:last-child {
+  margin-bottom: 0;
+}
+
+.stage-expand-content li strong {
+  color: var(--textPrimary);
+}
+
+/* ===== Original expand styles (for non-structured cards) ===== */
+.expand-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.expand-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--primarySoft);
+  background: var(--primarySoft);
+  color: var(--primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.expand-btn:hover {
+  background: var(--primary);
+  color: var(--onPrimary);
+  transform: translateY(-1px);
+}
+
+.expand-btn.active {
+  background: var(--primary);
+  color: var(--onPrimary);
+}
+
+.expand-content {
+  display: none;
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--surfaceAlt);
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+}
+
+.expand-content ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.expand-content li {
+  margin-bottom: 8px;
+  font-size: 0.88rem;
+  color: var(--textSecondary);
+  line-height: 1.5;
+}
+
+.expand-content li:last-child {
+  margin-bottom: 0;
+}
+
+.expand-content li strong {
+  color: var(--textPrimary);
+}
+
+.stage-card:has(.expand-content:not([style*="display: none"])) {
+  background: var(--surface);
+  box-shadow: 0 8px 24px var(--shadowColor);
+}
+
 .atlas-grid,
 .portfolio-grid,
 .split-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* ─── Atlas Extended Drawer ─── */
+.atlas-extended-drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.atlas-extended-drawer.is-open {
+  grid-template-rows: 1fr;
+}
+
+.atlas-extended-drawer-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.atlas-extended-trigger {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  transition: color 0.2s;
+}
+
+.atlas-extended-trigger:hover {
+  color: var(--primaryHover);
+}
+
+.atlas-extended-trigger .chevron {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.atlas-extended-trigger.is-open .chevron {
+  transform: rotate(180deg);
 }
 
 .lineage-grid {
@@ -598,8 +960,8 @@ main.page-shell {
 .data-table th,
 .data-table td {
   padding: 12px 14px;
-  text-align: left;
-  vertical-align: top;
+  text-align: center;
+  vertical-align: middle;
   border-bottom: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
 }
 
@@ -627,6 +989,18 @@ main.page-shell {
   font-weight: 700;
   color: var(--primary);
   background: color-mix(in srgb, var(--primarySoft) 72%, var(--surface));
+}
+
+.stage-tag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  background: #2563eb;
+  letter-spacing: 0.03em;
 }
 
 .evidence-grid {
@@ -1042,4 +1416,219 @@ button.ghost {
     padding-left: 16px;
     padding-right: 16px;
   }
+}
+
+/* ── Dataset Table Row Click ── */
+.dataset-row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.dataset-row:hover {
+  background-color: #f8f9fa;
+}
+
+/* ── Dataset Detail Page ── */
+.dataset-detail-banner {
+  padding: 28px 32px;
+}
+
+.dataset-detail-banner .eyebrow {
+  margin-bottom: 8px;
+}
+
+.dataset-detail-banner h1 {
+  margin: 0 0 12px 0;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+
+.dataset-detail-banner p:last-child {
+  max-width: 80ch;
+  color: var(--textSecondary);
+  margin: 0;
+}
+
+/* ── Data Download Card ── */
+.data-download-card {
+  padding: 0;
+  overflow: visible;
+}
+
+.download-card-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.download-table-controls {
+  padding: 18px 20px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+}
+
+.download-search-input {
+  flex: 1;
+  min-width: 240px;
+  border: 1px solid color-mix(in srgb, var(--border) 84%, transparent);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--surface) 90%, var(--backgroundStrong));
+  color: var(--textPrimary);
+  font-size: 0.9rem;
+}
+
+.download-search-input::placeholder {
+  color: var(--textSecondary);
+}
+
+.download-reset-btn {
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* ── Download Table ── */
+.download-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.download-table th,
+.download-table td {
+  padding: 10px 8px;
+  font-size: 0.78rem;
+  text-align: center;
+  vertical-align: middle;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  border-right: 1px solid #e9ecef;
+}
+
+/* Remove right border from last column */
+.download-table th:last-child,
+.download-table td:last-child {
+  border-right: none;
+}
+
+/* Header row styling */
+.download-table thead tr {
+  background: #fbfcfd;
+}
+
+.download-table th {
+  background: #fbfcfd;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: center;
+  padding: 12px 8px;
+  font-weight: 600;
+  color: var(--textPrimary);
+  letter-spacing: 0.02em;
+}
+
+/* Filter input styling */
+.download-table th input {
+  width: 100%;
+  margin-top: 8px;
+  border: 1px solid #d1d8e0;
+  border-radius: 16px;
+  padding: 8px 12px;
+  font-size: 0.72rem;
+  background: var(--surface);
+  color: var(--textPrimary);
+  box-sizing: border-box;
+  height: 32px;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.download-table th input::placeholder {
+  color: #9aa5b1;
+  opacity: 1;
+  font-size: 0.7rem;
+}
+
+.download-table th input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primarySoft) 60%, transparent);
+}
+
+/* ── Column Widths (14-col: NUMBER, SPECIES, ATLAS, TISSUE, STATUS, PLATFORM, SEQ-TYPE, YEAR, ACCESSION, link, DATASETS, DOI, SHARE) ── */
+.download-table th:nth-child(1),
+.download-table td:nth-child(1) { width: 60px; text-align: center; }   /* NUMBER */
+.download-table th:nth-child(2),
+.download-table td:nth-child(2) { width: 100px; }   /* SPECIES */
+.download-table th:nth-child(3),
+.download-table td:nth-child(3) { width: 100px; }   /* ATLAS */
+.download-table th:nth-child(4),
+.download-table td:nth-child(4) { width: 90px; }   /* TISSUE */
+.download-table th:nth-child(5),
+.download-table td:nth-child(5) { width: 80px; }   /* STATUS */
+.download-table th:nth-child(6),
+.download-table td:nth-child(6) { width: 100px; }  /* PLATFORM */
+.download-table th:nth-child(7),
+.download-table td:nth-child(7) { width: 90px; }   /* SEQ-TYPE */
+.download-table th:nth-child(8),
+.download-table td:nth-child(8) { width: 60px; text-align: center; }   /* YEAR */
+.download-table th:nth-child(9),
+.download-table td:nth-child(9) { width: 120px; }  /* ACCESSION */
+.download-table th:nth-child(10),
+.download-table td:nth-child(10) { width: 150px; } /* link */
+.download-table th:nth-child(11),
+.download-table td:nth-child(11) { width: 140px; } /* DATASETS */
+.download-table th:nth-child(12),
+.download-table td:nth-child(12) { width: 90px; text-align: center; } /* DOI */
+.download-table th:nth-child(13),
+.download-table td:nth-child(13) { width: 80px; text-align: center; } /* share */
+/* ── Download Link ── */
+.download-link {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.download-link:hover {
+  color: var(--primary);
+}
+
+/* ── Download Table Container ── */
+.data-download-card .table-container {
+  padding: 0;
+  max-height: 600px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Body row hover effect */
+.download-table tbody tr:hover td {
+  background: color-mix(in srgb, var(--primarySoft) 30%, transparent);
+}
+
+/* Alternating row background */
+.download-table tbody tr:nth-child(even) td {
+  background: #fafcfd;
+}
+
+/* Download link button style */
+.download-link-btn {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--primary, #2563eb);
+  border: 1.5px solid var(--primary, #2563eb);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.download-link-btn:hover {
+  background: var(--primary, #2563eb);
+  color: #fff;
 }

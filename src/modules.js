@@ -1,5 +1,6 @@
 import {
   atlasViews,
+  otherAtlasViews,
   bundleCrossLinks,
   coreQuestions,
   databasePortfolio,
@@ -119,9 +120,8 @@ export function renderHeroSection() {
       ${stageTimeline
         .map(
           (stage) => `<article class="timeline-stop">
-            <span>${String(stage.rank).padStart(2, '0')}</span>
             <strong>${stage.label}</strong>
-            <p>${stage.window}</p>
+            <p>${stage.window.replace(/\n/g, '<br>')}</p>
           </article>`
         )
         .join('')}
@@ -139,17 +139,60 @@ export function renderStageOverviewSection() {
     <div class="stage-grid">
       ${stageTimeline
         .map(
-          (stage) => `<article class="stage-card card">
-            <div class="stage-meta">
-              <span>${String(stage.rank).padStart(2, '0')}</span>
-              <p>${stage.window}</p>
-            </div>
-            <h3>${stage.label}</h3>
-            <p class="stage-headline">${stage.headline}</p>
-            <p>${stage.summary}</p>
-            ${renderChipList(stage.compartments)}
-            <p class="stage-question">${stage.question}</p>
-          </article>`
+          (stage) => {
+            return `<article class="stage-card structured card">
+              <div class="card-inner">
+
+                <div class="stage-header">
+                  <div>
+                    <p class="stage-label">${stage.label}</p>
+                  </div>
+                  <p class="stage-window">${stage.window.replace(/\n/g, '<br>')}</p>
+                </div>
+
+                <div class="section-block section-emphasis">
+                  <p class="stage-section-header">Biological Emphasis</p>
+                  <div class="section-body">
+                    <p class="stage-bio-headline">${stage.headline}</p>
+                    <p class="stage-bio-summary">${stage.summary}</p>
+                    ${stage.biologicalEvents ? `
+                      <button class="stage-inline-expand" data-target="bio-events-${stage.rank}">
+                        Other Events <span class="expand-arrow">&#9654;</span>
+                      </button>
+                      <div class="stage-expand-content" id="bio-events-${stage.rank}">${stage.biologicalEvents}</div>
+                    ` : ''}
+                  </div>
+                </div>
+
+                <div class="section-block section-compartments">
+                  <p class="stage-section-header">Dominant Compartments</p>
+                  <div class="section-body">
+                    ${renderChipList(stage.compartments)}
+                    ${stage.cellInteractions ? `
+                      <button class="stage-inline-expand" data-target="cell-interactions-${stage.rank}">
+                        Cell-Cell Interactions <span class="expand-arrow">&#9654;</span>
+                      </button>
+                      <div class="stage-expand-content" id="cell-interactions-${stage.rank}">${stage.cellInteractions}</div>
+                    ` : ''}
+                  </div>
+                </div>
+
+                <div class="section-block section-question">
+                  <p class="stage-section-header">Developmental Question</p>
+                  <div class="section-body">
+                    <p class="stage-question">${stage.question}</p>
+                    ${stage.moreQuestions ? `
+                      <button class="stage-inline-expand" data-target="more-questions-${stage.rank}">
+                        More Questions <span class="expand-arrow">&#9654;</span>
+                      </button>
+                      <div class="stage-expand-content" id="more-questions-${stage.rank}">${stage.moreQuestions}</div>
+                    ` : ''}
+                  </div>
+                </div>
+
+              </div>
+            </article>`;
+          }
         )
         .join('')}
     </div>
@@ -174,10 +217,39 @@ export function renderAtlasOverviewSection() {
         )
         .join('')}
     </div>
+
+    <button
+      type="button"
+      class="atlas-extended-trigger"
+      id="atlas-extended-toggle"
+      aria-expanded="false"
+      aria-controls="atlas-extended-drawer"
+    >
+      <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="3 6 8 11 13 6"/>
+      </svg>
+      Peripheral biological themes
+    </button>
+
+    <div class="atlas-extended-drawer" id="atlas-extended-drawer" role="region" aria-label="Extended developmental views">
+      <div class="atlas-extended-drawer-inner">
+        <div class="atlas-grid">
+          ${otherAtlasViews
+            .map(
+              (view) => `<article class="atlas-card card">
+                <span>${view.stage}</span>
+                <h3>${view.title}</h3>
+                <p>${view.summary}</p>
+              </article>`
+            )
+            .join('')}
+        </div>
+      </div>
+    </div>
   </section>`;
 }
 
-export function renderAtlasViewerSection(selectedStage = 'embryonic', mode = 'light') {
+export function renderAtlasViewerSection(selectedStage = 'fetal', mode = 'light') {
   const viewerUrl = viewerUrlForConfig(selectedStage, mode);
 
   return `<section class="section-block" id="LD-UMAP-001">
@@ -215,6 +287,7 @@ export function renderLineageSection(options = {}) {
       ${tracks
         .map(
           (track) => `<article class="lineage-card card">
+            ${track.tag ? `<span class="lineage-tag">${track.tag}</span>` : ''}
             <p class="lineage-label">${track.start}</p>
             <h3>${track.name}</h3>
             <p>${track.transition}</p>
@@ -275,14 +348,14 @@ export function renderDatasetSection(options = {}) {
   return `<section class="section-block" id="LD-DATASET-001">
     ${renderSectionHead(
       'Datasets and releases',
-      'Prototype releases anchored to developmental scope',
-      'Each release row states the developmental window, assay footprint, and current prototype confidence level.'
+      'Releases anchored to developmental scope',
+      'Each release row states the developmental window, assay footprint, and current confidence level.'
     )}
     <article class="card data-table-card">
       <div class="table-card-head">
         <div>
           <h3>Dataset release table</h3>
-          <p>${compact ? `Showing ${visibleDatasets.length} of ${datasetReleases.length} current prototype releases.` : `Showing all ${datasetReleases.length} current prototype releases.`}</p>
+          <p>${compact ? `Showing ${visibleDatasets.length} of ${datasetReleases.length} current releases.` : `Showing all ${datasetReleases.length} current releases.`}</p>
         </div>
       </div>
       <div class="table-container">
@@ -290,9 +363,7 @@ export function renderDatasetSection(options = {}) {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Dataset</th>
-              <th>Coverage</th>
-              <th>Cells</th>
+              <th>Stage</th>
               <th>Assays</th>
               <th>Status</th>
               <th>Notes</th>
@@ -301,11 +372,9 @@ export function renderDatasetSection(options = {}) {
           <tbody>
             ${visibleDatasets
               .map(
-                (dataset) => `<tr>
+                (dataset) => `<tr class="dataset-row" data-dataset-id="${dataset.id}" style="cursor: pointer;">
                   <td>${dataset.id}</td>
-                  <td><strong>${dataset.title}</strong></td>
-                  <td>${dataset.coverage}</td>
-                  <td>${dataset.cells}</td>
+                  <td><span class="stage-tag">${dataset.stage}</span></td>
                   <td>${dataset.assays}</td>
                   <td><span class="table-status">${dataset.status}</span></td>
                   <td>${dataset.note}</td>
@@ -324,12 +393,90 @@ export function renderDatasetSection(options = {}) {
   </section>`;
 }
 
+export function renderDatasetDetailPage(datasetId) {
+  const dataset = datasetReleases.find((d) => d.id === datasetId);
+  
+  if (!dataset) {
+    return `<main class="page-shell">
+      <section class="page-banner card">
+        <p class="eyebrow">Dataset not found</p>
+        <h1>Unknown Dataset</h1>
+        <p>The requested dataset ID "${datasetId}" could not be found.</p>
+      </section>
+    </main>`;
+  }
+
+  // Dataset metadata based on ID
+  const datasetMeta = {
+    'LD-DS-001': {
+      eyebrow: 'FULL SPECTRUM',
+      title: 'Lung Development Atlas',
+      description: 'Integrated single-cell atlas covering all lung developmental stages. Browse, filter, and download single-cell data spanning fetal, neonatal, pediatric, and adult stages.'
+    }
+  };
+
+  const meta = datasetMeta[datasetId] || {
+    eyebrow: dataset.stage.toUpperCase(),
+    title: `${dataset.stage} Lung Dataset`,
+    description: dataset.note
+  };
+
+  return `<main class="page-shell">
+    <section class="page-banner card dataset-detail-banner">
+      <p class="eyebrow">${meta.eyebrow} • ${dataset.id}</p>
+      <h1>${meta.title}</h1>
+      <p>${meta.description}</p>
+    </section>
+
+    <section class="section-block">
+      <article class="card data-download-card">
+        <div class="download-card-wrapper">
+          <div class="download-table-controls">
+            <input
+              type="text"
+              class="download-search-input"
+              data-download-search
+              placeholder="Search across all columns..."
+              aria-label="Search dataset table"
+            />
+            <button type="button" class="ghost download-reset-btn" data-download-reset>Reset all filters</button>
+          </div>
+          <div class="table-container">
+            <table class="data-table download-table" data-download-table>
+              <thead>
+                <tr>
+                  <th>NUMBER <input type="text" class="col-filter-input" placeholder="Filter..." data-col-filter="0"></th>
+                  <th>SPECIES <input type="text" class="col-filter-input" placeholder="Filter..." data-col-filter="1"></th>
+                  <th>ATLAS <input type="text" class="col-filter-input" placeholder="Filter..." data-col-filter="2"></th>
+                  <th>TISSUE <input type="text" class="col-filter-input" placeholder="Filter..." data-col-filter="3"></th>
+                  <th>STATUS <input type="text" class="col-filter-input" placeholder="Filter..." data-col-filter="4"></th>
+                  <th>PLATFORM <input type="text" class="col-filter-input" placeholder="Filter..." data-col-filter="5"></th>
+                  <th>SEQ-TYPE <input type="text" class="col-filter-input" placeholder="Filter..." data-col-filter="6"></th>
+                  <th>YEAR <input type="text" class="col-filter-input" placeholder="Filter..." data-col-filter="7"></th>
+                  <th>ACCESSION <input type="text" class="col-filter-input" placeholder="Filter..." data-col-filter="8"></th>
+                  <th>link <input type="text" class="col-filter-input" placeholder="Filter..." data-col-filter="9"></th>
+                  <th>DATASETS <input type="text" class="col-filter-input" placeholder="Filter..." data-col-filter="10"></th>
+                  <th>DOI <input type="text" class="col-filter-input" placeholder="Filter..." data-col-filter="11"></th>
+                  <th>share</th>
+                </tr>
+              </thead>
+              <tbody data-download-tbody>
+                <!-- Data will be populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>`;
+}
+
 export function renderEvidenceSection() {
   return `<section class="section-block" id="LD-EVIDENCE-001">
     ${renderSectionHead(
       'Evidence and provenance',
       'Make MVP scope explicit before deeper data integration',
-      'The current prototype favors transparent staging, route logic, and release framing over synthetic completeness.'
+      'The current approach favors transparent staging, route logic, and release framing over synthetic completeness.'
     )}
     <div class="evidence-grid">
       <article class="card">
@@ -438,7 +585,7 @@ export function renderHomePage() {
   </main>`;
 }
 
-export function renderAtlasPage(selectedStage = 'embryonic', mode = 'light') {
+export function renderAtlasPage(selectedStage = 'fetal', mode = 'light') {
   return `<main class="page-shell">
     ${renderPageBanner('atlas')}
     ${renderAtlasViewerSection(selectedStage, mode)}

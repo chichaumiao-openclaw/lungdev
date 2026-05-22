@@ -24,14 +24,22 @@ body[data-mode='dark'] {
   --viewer-canvas: #09141b;
 }
 
-body {
+html, body {
   margin: 0;
+  height: 100%;
+  overflow: hidden;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--viewer-bg);
   color: var(--viewer-text);
 }
 
-.app-wrap { padding: 16px; }
+.app-wrap {
+  padding: 16px;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
 header h2 { margin: 0; }
 header p { margin-top: 6px; color: var(--viewer-muted); }
 .stage-badge {
@@ -45,10 +53,148 @@ header p { margin-top: 6px; color: var(--viewer-muted); }
   font-size: 0.86rem;
   font-weight: 600;
 }
-.dashboard-layout { margin-top: 14px; display: grid; grid-template-columns: 320px 1fr; gap: 14px; height: calc(100vh - 120px); }
-.panel { background: var(--viewer-panel); border: 1px solid var(--viewer-border); border-radius: 14px; padding: 12px; overflow: hidden; }
-.plot-panel { display: flex; flex-direction: column; }
+.dashboard-layout {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+}
+.panel { background: var(--viewer-panel); border: 1px solid var(--viewer-border); border-radius: 14px; padding: 12px; overflow-y: auto; }
+.plot-panel { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
 .plot-panel > div:last-child { flex: 1; min-height: 0; }
+
+.plot-main {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+}
+.plot-main .umap-canvas {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  background: var(--viewer-canvas);
+  display: block;
+}
+
+/* ── Plot + Cell Type Sidebar ─────────────────────────────────────── */
+.plot-with-sidebar {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 12px;
+  height: 100%;
+}
+.cell-type-sidebar {
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh !important;
+  overflow-y: auto !important;
+  position: sticky !important;
+  top: 20px !important;
+  align-self: flex-start;
+}
+.cell-type-sidebar .sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+.cell-type-sidebar .sidebar-header h4 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--viewer-text);
+  margin: 0;
+}
+.sidebar-actions {
+  display: flex;
+  gap: 4px;
+}
+.sidebar-btn {
+  background: var(--viewer-input);
+  color: var(--viewer-muted);
+  border: 1px solid var(--viewer-border);
+  border-radius: 6px;
+  padding: 3px 7px;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+.sidebar-btn:hover { color: var(--viewer-text); }
+.cell-type-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cell-type-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 5px 6px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+.cell-type-item:hover { background: var(--viewer-input); }
+.cell-type-item--hidden {
+  opacity: 0.38;
+}
+.cell-type-swatch {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.cell-type-name {
+  flex: 1;
+  font-size: 0.75rem;
+  color: var(--viewer-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cell-type-count {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  color: var(--viewer-muted);
+  font-variant-numeric: tabular-nums;
+}
+.loading-bar {
+  text-align: center;
+  padding: 8px;
+  font-size: 0.82rem;
+  color: var(--viewer-muted);
+  background: var(--viewer-input);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.sidebar-toggle-btn {
+  display: inline-block;
+  background: var(--viewer-primary-soft);
+  color: var(--viewer-primary);
+  border: 1px solid color-mix(in srgb, var(--viewer-primary) 40%, transparent);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
+
 .umap-canvas {
   width: 100%;
   height: 560px;
@@ -105,4 +251,6 @@ input, select {
 @media (max-width: 960px) {
   .dashboard-layout { grid-template-columns: 1fr; height: auto; }
   .plot-panel { min-height: 460px; }
+  .plot-with-sidebar { grid-template-columns: 1fr; }
+  .cell-type-sidebar { max-height: 260px; }
 }

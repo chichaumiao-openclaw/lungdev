@@ -11,3 +11,16 @@ export function routeFromHash(hashValue) {
   const withoutHash = hashValue.startsWith('#') ? hashValue.slice(1) : hashValue;
   return normalizeRoute(withoutHash);
 }
+
+// Dataset detail route: #datasets/LD-DS-001
+export function parseDatasetDetailRoute(hashValue) {
+  if (typeof hashValue !== 'string' || hashValue.length === 0) return null;
+  const withoutHash = hashValue.startsWith('#') ? hashValue.slice(1) : hashValue;
+  
+  // Match pattern: datasets/LD-DS-001
+  const match = withoutHash.match(/^datasets\/(LD-DS-\d+)$/i);
+  if (match) {
+    return { route: 'dataset-detail', datasetId: match[1].toUpperCase() };
+  }
+  return null;
+}

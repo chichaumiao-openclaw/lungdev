@@ -14,17 +14,17 @@
     "validate:h5ad": "python3 validate_h5ad_loader.py"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "d3-fetch": "^3.0.1",
     "@deck.gl/core": "^9.1.12",
     "@deck.gl/layers": "^9.1.12",
     "@deck.gl/react": "^9.1.12",
     "@luma.gl/core": "^9.1.8",
-    "react-beautiful-dnd": "^13.1.1"
+    "d3-fetch": "^3.0.1",
+    "react": "^18.3.1",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "vite": "^5.4.10",
-    "@vitejs/plugin-react": "^4.3.2"
+    "@vitejs/plugin-react": "^4.7.0",
+    "vite": "^5.4.21"
   }
 }
